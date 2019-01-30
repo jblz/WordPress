@@ -109,10 +109,6 @@ function _wp_post_revision_data( $post = array(), $autosave = false ) {
  * @return int|WP_Error|void Void or 0 if error, new revision ID, if success.
  */
 function wp_save_post_revision( $post_id ) {
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-		return;
-	}
-
 	if ( ! $post = get_post( $post_id ) ) {
 		return;
 	}
@@ -126,6 +122,12 @@ function wp_save_post_revision( $post_id ) {
 	}
 
 	if ( ! wp_revisions_enabled( $post ) ) {
+		return;
+	}
+
+	$is_draft = 'draft' === $post->post_status;
+
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE && ! $is_draft ) {
 		return;
 	}
 
